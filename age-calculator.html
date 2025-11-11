@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Ai Tool Hub — Age Calculator</title>
+  <style>
+    :root {
+      --bg:#0F1224; --panel:#1B1E34; --text:#EAEAEA;
+      --accent:#FFD700; --error:#FF6B6B; --shadow:rgba(255,215,0,0.18);
+    }
+    body {
+      margin:0; font-family:'Segoe UI',sans-serif;
+      background:linear-gradient(135deg,#0F1224,#1B1E34); color:var(--text);
+    }
+    header {
+      background:var(--panel); padding:16px 24px;
+      display:flex; justify-content:space-between; align-items:center;
+      box-shadow:0 4px 14px var(--shadow);
+    }
+    .logo {font-weight:bold; font-size:1.2rem; color:var(--accent);}
+    nav a {margin-left:16px; color:var(--text); text-decoration:none;}
+    .container {max-width:700px; margin:auto; padding:20px;}
+    .panel {
+      background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
+      border-radius:12px; padding:20px; box-shadow:0 8px 22px var(--shadow);
+    }
+    label {display:block; margin-top:10px; font-weight:600;}
+    input,button {
+      margin-top:6px; padding:10px; border-radius:8px; border:none;
+      width:100%; font-size:1rem;
+    }
+    input {background:#222642; color:var(--text);}
+    button {
+      background:linear-gradient(90deg,purple,blue,green,yellow);
+      color:var(--text); font-weight:bold; cursor:pointer;
+    }
+    button:hover {transform:scale(1.05);}
+    .error {color:var(--error); font-weight:bold; margin-top:10px;}
+    .results {margin-top:20px;}
+    .results h3 {margin-bottom:6px;}
+    .results p {margin:4px 0;}
+    @media(max-width:600px){.container{padding:10px;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Tools Wonder</div>
+    <nav>
+      <a href="#">Home</a><a href="#">Tools</a><a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Age Calculator Tool</h1>
+    <div class="panel">
+      <label for="dob">Date of Birth (DD/MM/YYYY)</label>
+      <input type="text" id="dob" placeholder="e.g. 11/11/1990"/>
+
+      <label for="tob">Time of Birth (HH:MM AM/PM, optional)</label>
+      <input type="text" id="tob" placeholder="e.g. 10:30 AM"/>
+
+      <button id="calcBtn">Calculate Age</button>
+      <div id="errorBox" class="error" style="display:none;"></div>
+
+      <div id="results" class="results" style="display:none;">
+        <h3>Your Age:</h3>
+        <p id="ageYMD"></p>
+        <p id="ageHM"></p>
+        <h3>Next Birthday Countdown:</h3>
+        <p id="nextBirthday"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function parseDate(dobStr, tobStr){
+      const parts = dobStr.split('/');
+      if(parts.length!==3) return null;
+      const day = parseInt(parts[0],10);
+      const month = parseInt(parts[1],10)-1;
+      const year = parseInt(parts[2],10);
+      if(isNaN(day)||isNaN(month)||isNaN(year)) return null;
+
+      let hours=0, minutes=0;
+      if(tobStr){
+        const match = tobStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if(match){
+          hours = parseInt(match[1],10);
+          minutes = parseInt(match[2],10);
+          const ampm = match[3].toUpperCase();
+          if(ampm==="PM" && hours<12) hours+=12;
+          if(ampm==="AM" && hours===12) hours=0;
+        }
+      }
+      return new Date(year,month,day,hours,minutes);
+    }
+
+    function calculateAge(birthDate){
+      const now = new Date();
+      if(birthDate>now) return null;
+
+      let years = now.getFullYear()-birthDate.getFullYear();
+      let months = now.getMonth()-birthDate.getMonth();
+      let days = now.getDate()-birthDate.getDate();
+      if(days<0){
+        months--; 
+        const prevMonth = new Date(now.getFullYear(),now.getMonth(),0);
+        days += prevMonth.getDate();
+      }
+      if(months<0){ years--; months+=12; }
+
+      const diffMs = now-birthDate;
+      const diffMins = Math.floor(diffMs/60000);
+      const hours = Math.floor(diffMins/60);
+      const minutes = diffMins%60;
+
+      return {years,months,days,hours,minutes};
+    }
+
+    function nextBirthdayCountdown(birthDate){
+      const now = new Date();
+      let next = new Date(now.getFullYear(),birthDate.getMonth(),birthDate.getDate());
+      if(next<now){ next.setFullYear(now.getFullYear()+1); }
+      const diffDays = Math.ceil((next-now)/(1000*60*60*24));
+      return diffDays;
+    }
+
+    document.getElementById('calcBtn').addEventListener('click',()=>{
+      const dobStr = document.getElementById('dob').value.trim();
+      const tobStr = document.getElementById('tob').value.trim();
+      const birthDate = parseDate(dobStr,tobStr);
+      const errorBox = document.getElementById('errorBox');
+      const results = document.getElementById('results');
+      if(!birthDate){ errorBox.textContent="Invalid date/time format."; errorBox.style.display="block"; results.style.display="none"; return; }
+      const age = calculateAge(birthDate);
+      if(!age){ errorBox.textContent="Date of birth is in the future."; errorBox.style.display="block"; results.style.display="none"; return; }
+      errorBox.style.display="none";
+
+      document.getElementById('ageYMD').textContent=`${age.years} years, ${age.months} months, ${age.days} days`;
+      document.getElementById('ageHM').textContent=`${age.hours} hours, ${age.minutes} minutes since birth`;
+      document.getElementById('nextBirthday').textContent=`${nextBirthdayCountdown(birthDate)} days remaining`;
+
+      results.style.display="block";
+    });
+  </script>
+</body>
+  </html>
