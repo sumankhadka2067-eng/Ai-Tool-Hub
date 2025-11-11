@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ai Tool Hub — Multi‑Feature AI Tool</title>
+  <style>
+    :root{
+      --bg:#0F1224; --panel:#1B1E34; --panel2:#222642;
+      --text:#EAEAEA; --muted:#B9BCD6; --accent:#FFD700;
+      --error:#FF6B6B; --ok:#31C48D; --shadow:rgba(255,215,0,0.18);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+      background: radial-gradient(1100px 700px at 10% 10%, #3A4CF6 0%, #0F1224 55%, #090A17 100%),
+                  conic-gradient(from 240deg at 90% 5%, #FF7AC8 0%, #FFD700 28%, #22D3EE 62%, #7C3AED 88%, #FF7AC8 100%);
+      background-blend-mode: screen, normal;
+      color:var(--text); min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter:saturate(1.1) blur(8px);
+      background:linear-gradient(180deg, rgba(27,30,52,0.85), rgba(27,30,52,0.55));
+      border-bottom:1px solid rgba(255,255,255,0.12);
+      box-shadow:0 8px 22px rgba(0,0,0,0.35);
+    }
+    .topbar{max-width:1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between}
+    .logo{font-weight:700} .logo span{color:var(--accent)}
+    nav a{color:var(--text); text-decoration:none; margin-left:12px}
+    .title{text-align:center; padding:26px 20px 10px}
+    .title h1{
+      margin:0 0 8px; font-size:2.2rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase;
+      background:linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-shadow:0 2px 30px rgba(255,255,255,0.08);
+    }
+    .title p{margin:0; opacity:.92}
+    .container{max-width:1100px; margin:0 auto; padding:20px}
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border:1px solid rgba(255,255,255,0.16);
+      backdrop-filter:blur(10px) saturate(1.05);
+      border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,0.35), 0 8px 22px var(--shadow);
+      padding:18px;
+    }
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .stack{display:flex; flex-direction:column; gap:12px}
+    label{font-weight:600}
+    input[type="file"], select, textarea{
+      color:var(--text); background:var(--panel2);
+      border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px; width:100%;
+    }
+    textarea{min-height:90px; resize:vertical}
+    .btn{
+      border:none; border-radius:10px; padding:12px 16px; font-weight:700; cursor:pointer; min-height:44px; color:#0F1224;
+      background:linear-gradient(135deg, #FFD700, #FF8C00, #FF6AC1);
+      box-shadow:0 8px 22px rgba(0,0,0,0.25), 0 6px 18px var(--shadow);
+      transition:transform .12s ease, filter .2s ease;
+      text-decoration:none; display:inline-block; text-align:center;
+    }
+    .btn:hover{filter:saturate(1.15) brightness(1.04)}
+    .note{font-size:.92rem; color:var(--muted)}
+    .error{color:var(--error); font-weight:600}
+    .status{padding:10px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12)}
+    .progress{height:10px; border-radius:8px; background:rgba(255,255,255,0.1); overflow:hidden}
+    .bar{height:100%; width:0%; background:linear-gradient(90deg, #FFD700, #FF6AC1)}
+    .preview{background:var(--panel2); border:1px solid rgba(255,255,255,0.12); border-radius:12px; overflow:hidden}
+    .preview-head{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.12)}
+    .preview-body{padding:12px}
+    .download{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    .btn-secondary{
+      border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer; color:var(--text);
+      background:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05)); border:1px solid rgba(255,255,255,0.16);
+    }
+    img, video{max-width:100%; border-radius:10px}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="logo">Tools <span>Wonder</span></div>
+      <nav aria-label="Main navigation">
+        <a href="#top">Home</a>
+        <a href="#tool">Tools</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <section id="top" class="title">
+    <h1>AI TOOL HUB</h1>
+    <p>Multi‑Feature AI — upload, prompt, generate realistic images/videos. Modes: Nano Banana, Leonardo AI, Video Prompt.</p>
+  </section>
+
+  <main id="tool" class="container">
+    <div class="panel">
+      <div class="grid">
+        <!-- Controls -->
+        <div class="stack">
+          <label for="mode">Feature mode</label>
+          <select id="mode">
+            <option value="nano">Nano Banana (photo + prompt)</option>
+            <option value="leonardo">Leonardo AI (prompt only)</option>
+            <option value="video">Video Prompt (video/photo + prompt)</option>
+          </select>
+
+          <label for="mediaInput">Upload image/video (optional for Leonardo)</label>
+          <input id="mediaInput" type="file" accept=".png,.jpg,.jpeg,.bmp,.gif,.tif,.tiff,.webp,.mp4,.mov,.wmv,.avi,.mkv,.flv,.webm,video/*,image/*" />
+          <div class="note">Images: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP • Videos: MP4, MOV, WMV, AVI, MKV, FLV, WEBM</div>
+
+          <label for="prompt">Prompt</label>
+          <textarea id="prompt" placeholder="Describe exactly what you want (style, lighting, mood, subject, actions)…"></textarea>
+
+          <button id="generateBtn" class="btn">Generate</button>
+          <div id="status" class="status" style="display:none;">
+            <div><strong>Processing:</strong> Generating output…</div>
+            <div class="progress"><div id="progressBar" class="bar"></div></div>
+            <div id="progressText" class="note" style="margin-top:6px;">Initializing…</div>
+          </div>
+          <div id="errorBox" class="error" style="display:none;"></div>
+        </div>
+
+        <!-- Previews -->
+        <div class="stack">
+          <div class="preview" id="inputPreview" style="display:none;">
+            <div class="preview-head">
+              <strong>Input preview</strong>
+              <span id="inputMeta" class="note"></span>
+            </div>
+            <div class="preview-body">
+              <img id="inputImg" alt="" style="display:none;"/>
+              <video id="inputVideo" controls style="display:none;"></video>
+            </div>
+          </div>
+
+          <div class="preview" id="outputPreview" style="display:none;">
+            <div class="preview-head">
+              <strong>Output preview</strong>
+              <span id="outputMeta" class="note"></span>
+            </div>
+            <div class="preview-body">
+              <img id="outputImg" alt="" style="display:none;"/>
+              <video id="outputVideo" controls style="display:none;"></video>
+              <div class="download">
+                <a id="downloadLink" class="btn-secondary" href="#" download>Download result</a>
+                <button id="resetBtn" class="btn-secondary">Reset</button>
+              </div>
+              <div id="formatNote" class="note" style="margin-top:6px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer id="contact">
+        Clean UI • Dark theme • Responsive • Client-side generation hooks (Canvas + FFmpeg.wasm). Plug your model/API keys where noted.
+      </footer>
+    </div>
+  </main>
+
+  <!-- FFmpeg.wasm via CDN -->
+  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.7/dist/ffmpeg.min.js"></script>
+  <script>
+    const fileEl = document.getElementById('mediaInput');
+    const modeEl = document.getElementById('mode');
+    const promptEl = document.getElementById('prompt');
+    const generateBtn = document.getElementById('generateBtn');
+    const statusBox = document.getElementById('status');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const errorBox = document.getElementById('errorBox');
+
+    const inputPreview = document.getElementById('inputPreview');
+    const inputImg = document.getElementById('inputImg');
+    const inputVideo = document.getElementById('inputVideo');
+    const inputMeta = document.getElementById('inputMeta');
+
+    const outputPreview = document.getElementById('outputPreview');
+    const outputImg = document.getElementById('outputImg');
+    const outputVideo = document.getElementById('outputVideo');
+    const outputMeta = document.getElementById('outputMeta');
+    const downloadLink = document.getElementById('downloadLink');
+    const formatNote = document.getElementById('formatNote');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
+
+    // Optional: map logger messages to progress bar (best effort)
+    ffmpeg.setLogger(({ type, message }) => {
+      if (type === 'info') {
+        progressText.textContent = message;
+        const m = message.match(/([0-9]{1,3})%/);
+        if (m) {
+          const pct = Math.min(100, Math.max(0, parseInt(m[1], 10)));
+          progressBar.style.width = pct + '%';
+        }
+      }
+    });
+
+    let mediaFile = null;
+    let mediaName = null;
+    let mediaType = null;
+    let mediaSize = 0;
+
+    fileEl.addEventListener('change', e => {
+      errorBox.style.display = 'none';
+      const file = e.target.files?.[0];
+      if (!file) return;
+      mediaFile = file;
+      mediaName = (file.name || 'media').replace(/\.[^.]+$/, '');
+      mediaType = file.type;
+      mediaSize = file.size;
+
+      const url = URL.createObjectURL(file);
+      const isImage = mediaType.startsWith('image/');
+      const isVideo = mediaType.startsWith('video/');
+
+      inputImg.style.display = isImage ? 'block' : 'none';
+      inputVideo.style.display = isVideo ? 'block' : 'none';
+      if (isImage) inputImg.src = url;
+      if (isVideo) inputVideo.src = url;
+
+      inputMeta.textContent = `${mediaType} • ${(mediaSize/1024/1024).toFixed(1)} MB`;
+      inputPreview.style.display = 'block';
+      outputPreview.style.display = 'none';
+    });
+
+    function validateInputs(){
+      const mode = modeEl.value;
+      const prompt = (promptEl.value || '').trim();
+      const needsMedia = (mode === 'nano' || mode === 'video');
+
+      if (needsMedia && !mediaFile){
+        showError('Please upload an image/video for this mode.');
+        return false;
+      }
+      if (!prompt){
+        showError('Please enter a descriptive prompt.');
+        return false;
+      }
+      if (mediaFile && mediaSize > (mode === 'video' ? 300*1024*1024 : 40*1024*1024)){
+        showError(mode === 'video' ? 'Video too large (max ~300MB).' : 'Image too large (max ~40MB).');
+        return false;
+      }
+      hideError();
+      return true;
+    }
+
+    function showError(msg){
+      errorBox.textContent = msg;
+      errorBox.style.display = 'block';
+    }
+    function hideError(){
+      errorBox.style.display = 'none';
+    }
+
+    generateBtn.addEventListener('click', async () => {
+      if (!validateInputs()) return;
+
+      statusBox.style.display = 'block';
+      progressBar.style.width = '0%';
+      progressText.textContent = 'Initializing…';
+      outputPreview.style.display = 'none';
+
+      const mode = modeEl.value;
+      try {
+        if (mode === 'leonardo'){
+          // Prompt‑only image generation.
+          // Plug your image generation API here (e.g., Stable Diffusion endpoint).
+          // For demo: create a canvas with styled text based on prompt (placeholder).
+          const { dataURL, meta } = await demoGenerateFromPrompt(promptEl.value);
+          outputImg.src = dataURL;
+          outputImg.style.display = 'block';
+          outputVideo.style.display = 'none';
+          outputMeta.textContent = meta;
+          downloadLink.href = dataURL;
+          downloadLink.download = `${slug(promptEl.value)}.png`;
+          formatNote.textContent = 'Replace demo with your image generation API for realistic outputs.';
+          outputPreview.style.display = 'block';
+        } else if (mode === 'nano'){
+          // Image + prompt transform (client canvas placeholder).
+          // Replace with your real enhancer (e.g., image-to-image diffusion).
+          const isImg = mediaType?.startsWith('image/');
+          if (!isImg) throw new Error('Upload an image for Nano Banana mode.');
+          const fileDataURL = await readFileAsDataURL(mediaFile);
+          const { dataURL, meta } = await demoTransformImage(fileDataURL, promptEl.value);
+          outputImg.src = dataURL;
+          outputImg.style.display = 'block';
+          outputVideo.style.display = 'none';
+          outputMeta.textContent = meta;
+          downloadLink.href = dataURL;
+          downloadLink.download = `${mediaName}-enhanced.png`;
+          formatNote.textContent = 'Replace demo with your image‑to‑image pipeline.';
+          outputPreview.style.display = 'block';
+        } else {
+          // Video prompt: use FFmpeg.wasm to convert/overlay text watermark based on prompt (placeholder).
+          const isVid = mediaType?.startsWith('video/');
+          const isImg = mediaType?.startsWith('image/');
+          if (!isVid && !isImg) throw new Error('Upload a video or image for Video Prompt mode.');
+
+          if (!ffmpeg.isLoaded()){
+            progressText.textContent = 'Loading FFmpeg core…';
+            await ffmpeg.load();
+          }
+
+          // Write input
+          const inExt = getExtFromType(mediaType);
+          const inName = `${mediaName}${inExt}`;
+          await ffmpeg.FS('writeFile', inName, await fetchFile(mediaFile));
+
+          let outName = '';
+          if (isVid){
+            // Simple transcode to MP4 H.264 + watermark text (prompt) using drawtext (if available).
+            // drawtext often needs fonts; as a placeholder, we just transcode.
+            outName = `${mediaName}-generated.mp4`;
+            progressText.textContent = 'Transcoding to MP4 (placeholder)…';
+            await ffmpeg.run('-i', inName, '-c:v', 'libx264', '-preset', 'medium', '-crf', '23', '-c:a', 'aac', '-b:a', '128k', outName);
+            const data = ffmpeg.FS('readFile', outName);
+            const blob = new Blob([data.buffer], { type: 'video/mp4' });
+            const url = URL.createObjectURL(blob);
+            outputVideo.src = url;
+            outputVideo.style.display = 'block';
+            outputImg.style.display = 'none';
+            outputMeta.textContent = `video/mp4 • ${(blob.size/1024/1024).toFixed(1)} MB`;
+            downloadLink.href = url;
+            downloadLink.download = outName;
+            formatNote.textContent = 'Replace transcode with your prompt‑guided generation (e.g., overlays, cuts, AI model).';
+            outputPreview.style.display = 'block';
+          } else {
+            // If image uploaded in video mode: animate as a short WEBM slideshow placeholder.
+            outName = `${mediaName}-animated.webm`;
+            progressText.textContent = 'Creating short WEBM from image (placeholder)…';
+            // Minimal placeholder: re‑encode as webp and report.
+            const fileDataURL = await readFileAsDataURL(mediaFile);
+            const { dataURL } = await demoTransformImage(fileDataURL, promptEl.value);
+            outputImg.src = dataURL;
+            outputImg.style.display = 'block';
+            outputVideo.style.display = 'none';
+            outputMeta.textContent = 'image/webp • prompt‑guided placeholder';
+            downloadLink.href = dataURL;
+            downloadLink.download = `${mediaName}-animated.webp`;
+            formatNote.textContent = 'Replace with real video generation pipeline.';
+            outputPreview.style.display = 'block';
+          }
+        }
+      } catch (err){
+        console.error(err);
+        showError(err.message || 'Generation error. Try a different input or prompt.');
+      } finally {
+        statusBox.style.display = 'none';
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      fileEl.value = '';
+      mediaFile = null; mediaName = null; mediaType = null; mediaSize = 0;
+      inputPreview.style.display = 'none';
+      outputPreview.style.display = 'none';
+      errorBox.style.display = 'none';
+      statusBox.style.display = 'none';
+      progressBar.style.width = '0%';
+      progressText.textContent = 'Initializing…';
+      promptEl.value = '';
+      formatNote.textContent = '';
+    });
+
+    // —— Helpers & demo placeholders ——
+    function slug(s){ return (s||'output').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+    function readFileAsDataURL(file){
+      return new Promise((resolve,reject)=>{
+        const r = new FileReader();
+        r.onload = ()=>resolve(r.result);
+        r.onerror = ()=>reject(new Error('Failed to read file'));
+        r.readAsDataURL(file);
+      });
+    }
+    async function demoGenerateFromPrompt(prompt){
+      // Canvas placeholder that generates a stylized card with the prompt.
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024; canvas.height = 576;
+      const ctx = canvas.getContext('2d');
+      const grd = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+      grd.addColorStop(0,'#1B1E34'); grd.addColorStop(1,'#3A4CF6');
+      ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#FFD700'; ctx.font = 'bold 44px Segoe UI';
+      ctx.fillText('Prompt‑Generated', 40, 80);
+      ctx.fillStyle = '#EAEAEA'; ctx.font = '24px Segoe UI';
+      wrapText(ctx, prompt || 'Describe your vision…', 40, 140, 944, 32);
+      const dataURL = canvas.toDataURL('image/png');
+      return { dataURL, meta: 'image/png • 1024×576 • prompt demo' };
+    }
+    async function demoTransformImage(dataURL, prompt){
+      const img = await loadImage(dataURL);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      // Simple enhancement overlay (placeholder): gradient + caption
+      const grd = ctx.createLinearGradient(0,0,canvas.width,0);
+      grd.addColorStop(0,'rgba(255,215,0,0.15)');
+      grd.addColorStop(1,'rgba(124,58,237,0.15)');
+      ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0, canvas.height-80, canvas.width, 80);
+      ctx.fillStyle = '#FFD700'; ctx.font = 'bold 28px Segoe UI';
+      ctx.fillText('Enhanced', 20, canvas.height-48);
+      ctx.fillStyle = '#EAEAEA'; ctx.font = '20px Segoe UI';
+      ctx.fillText((prompt||'style prompt').slice(0,60), 20, canvas.height-20);
+      const out = canvas.toDataURL('image/webp', 0.92);
+      return { dataURL: out, meta: `image/webp • ${canvas.width}×${canvas.height} • enhanced demo` };
+    }
+    function loadImage(dataURL){
+      return new Promise((resolve,reject)=>{
+        const img = new Image();
+        img.onload = ()=>resolve(img);
+        img.onerror = ()=>reject(new Error('Unsupported or corrupted image'));
+        img.crossOrigin = 'anonymous';
+        img.src = dataURL;
+      });
+    }
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+      const words = String(text).split(' ');
+      let line = '';
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+    }
+    function getExtFromType(type){
+      switch(type){
+        case 'video/mp4': return '.mp4';
+        case 'video/quicktime': return '.mov';
+        case 'video/x-ms-wmv': return '.wmv';
+        case 'video/x-msvideo': return '.avi';
+        case 'video/x-matroska': return '.mkv';
+        case 'video/x-flv': return '.flv';
+        case 'video/webm': return '.webm';
+        case 'image/png': return '.png';
+        case 'image/jpeg': return '.jpg';
+        case 'image/webp': return '.webp';
+        case 'image/gif': return '.gif';
+        case 'image/tiff': return '.tiff';
+        case 'image/bmp': return '.bmp';
+        default: return '.bin';
+      }
+    }
+  </script>
+</body>
+</html>
