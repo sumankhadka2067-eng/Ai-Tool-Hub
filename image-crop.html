@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ai Tool Hub — Image Crop Tool</title>
+  <!-- Cropper.js CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0F1224;
+      --panel: #1B1E34;
+      --text: #EAEAEA;
+      --accent: #FFD700;
+      --error: #FF6B6B;
+      --shadow: rgba(255,215,0,0.18);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0F1224, #1B1E34);
+      color: var(--text);
+    }
+    header {
+      background: var(--panel);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+    .logo { font-weight: bold; font-size: 1.2rem; color: var(--accent); }
+    nav a { margin-left: 16px; color: var(--text); text-decoration: none; }
+    .container { max-width: 1100px; margin: auto; padding: 20px; }
+    .panel {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 22px var(--shadow);
+    }
+    input[type="file"], select, button {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background: linear-gradient(90deg, purple, blue, green, yellow);
+      color: var(--text);
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    button:hover { transform: scale(1.05); }
+    .preview { margin-top: 20px; }
+    img { max-width: 100%; }
+    .download { margin-top: 10px; }
+    .error { color: var(--error); font-weight: bold; }
+    @media(max-width:768px){ .container{padding:10px;} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Tools Wonder</div>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Tools</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Image Crop Tool</h1>
+    <div class="panel">
+      <label>Upload Image:</label>
+      <input type="file" id="fileInput" accept="image/*" />
+      <div class="error" id="errorBox" style="display:none;"></div>
+
+      <label>Select Aspect Ratio:</label>
+      <select id="aspectRatio">
+        <option value="NaN">Freeform</option>
+        <option value="4/3">4:3</option>
+        <option value="16/9">16:9</option>
+        <option value="16/10">16:10</option>
+        <option value="3/2">3:2</option>
+        <option value="1">1:1 (Square)</option>
+      </select>
+
+      <button id="cropBtn">Crop</button>
+      <div id="status" style="display:none;">Cropping image...</div>
+
+      <div class="preview">
+        <h3>Input Preview:</h3>
+        <img id="inputImg" alt="Upload to preview"/>
+      </div>
+
+      <div class="preview" id="outputPreview" style="display:none;">
+        <h3>Cropped Preview:</h3>
+        <img id="outputImg" alt="Cropped preview"/>
+        <div class="download">
+          <a id="downloadLink" href="#" download="cropped.png">Download Cropped Image</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cropper.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const inputImg = document.getElementById('inputImg');
+    const cropBtn = document.getElementById('cropBtn');
+    const aspectRatioSelect = document.getElementById('aspectRatio');
+    const statusBox = document.getElementById('status');
+    const errorBox = document.getElementById('errorBox');
+    const outputPreview = document.getElementById('outputPreview');
+    const outputImg = document.getElementById('outputImg');
+    const downloadLink = document.getElementById('downloadLink');
+
+    let cropper;
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 20*1024*1024) {
+        errorBox.textContent = "File too large (max 20MB)";
+        errorBox.style.display = "block";
+        return;
+      }
+      errorBox.style.display = "none";
+      const reader = new FileReader();
+      reader.onload = () => {
+        inputImg.src = reader.result;
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(inputImg, {
+          aspectRatio: NaN,
+          viewMode: 1,
+          responsive: true,
+          background: false,
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    cropBtn.addEventListener('click', () => {
+      if (!cropper) {
+        errorBox.textContent = "Please upload an image first.";
+        errorBox.style.display = "block";
+        return;
+      }
+      errorBox.style.display = "none";
+      statusBox.style.display = "block";
+
+      const ratio = aspectRatioSelect.value;
+      cropper.setAspectRatio(ratio === "NaN" ? NaN : eval(ratio));
+
+      const canvas = cropper.getCroppedCanvas();
+      if (!canvas) {
+        errorBox.textContent = "Cropping failed.";
+        errorBox.style.display = "block";
+        statusBox.style.display = "none";
+        return;
+      }
+      const dataURL = canvas.toDataURL("image/png");
+      outputImg.src = dataURL;
+      downloadLink.href = dataURL;
+      outputPreview.style.display = "block";
+      statusBox.style.display = "none";
+    });
+  </script>
+</body>
+  </html>
