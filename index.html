@@ -16,7 +16,7 @@
       --shadow-gold: rgba(255, 215, 0, 0.2);
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -31,6 +31,9 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 14px var(--shadow-gold);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     .logo {
@@ -44,6 +47,14 @@
       color: var(--text);
       text-decoration: none;
       font-weight: 500;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+
+    nav a:hover {
+      background: var(--accent);
+      color: #1E1E2F;
     }
 
     .hero {
@@ -148,23 +159,23 @@
   <header>
     <div class="logo">Tools Wonder</div>
     <nav>
-      <a href="#">Home</a>
-      <a href="#">Tools</a>
-      <a href="#">Contact</a>
+      <a href="#home">Home</a>
+      <a href="#tools">Tools</a>
+      <a href="#contact">Contact</a>
     </nav>
   </header>
 
-  <section class="hero">
+  <section id="home" class="hero">
     <h1>AI TOOL HUB</h1>
     <p>Explore a premium, minimalist collection of tools crafted to simplify your digital life. Clean design, modern interactions, fully responsive.</p>
   </section>
 
-  <section class="grid">
+  <section id="tools" class="grid">
     <!-- Tool Cards -->
     <div class="card">
       <h2>Image Converter</h2>
       <p>Convert images between formats quickly and reliably.</p>
-      <a class="btn" href="image-converter.html">Open Tool</a>
+      <a class="btn" href="..ImageConverter..">Open Tool</a>
     </div>
     <div class="card">
       <h2>Image Compressor</h2>
@@ -203,7 +214,7 @@
     </div>
   </section>
 
-  <footer>
+  <footer id="contact">
     <p><strong>Footer</strong></p>
     <p>Simplifying your digital life.</p>
     <p>Contact: <a href="mailto:khadkasuman2007@gmail.com">khadkasuman2007@gmail.com</a></p>
