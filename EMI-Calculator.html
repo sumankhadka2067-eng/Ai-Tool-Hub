@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Ai Tool Hub — EMI Calculator</title>
+  <style>
+    :root{
+      --bg:#0F1224; --panel:#1B1E34; --panel2:#222642;
+      --text:#EAEAEA; --muted:#B9BCD6; --accent:#FFD700;
+      --error:#FF6B6B; --shadow:rgba(255,215,0,0.18);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+      background: linear-gradient(135deg,#0F1224,#1B1E34); color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      background:var(--panel); padding:16px 24px;
+      display:flex; justify-content:space-between; align-items:center;
+      box-shadow:0 4px 14px var(--shadow);
+      position:sticky; top:0; z-index:10;
+    }
+    .logo{font-weight:700; font-size:1.1rem}
+    .logo span{color:var(--accent)}
+    nav a{margin-left:16px; color:var(--text); text-decoration:none}
+    .container{max-width:1000px; margin:0 auto; padding:20px}
+    .title{text-align:center; margin-bottom:12px}
+    .title h1{
+      margin:0 0 8px; font-size:2rem; font-weight:800; text-transform:uppercase;
+      background:linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border:1px solid rgba(255,255,255,0.16);
+      border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,0.35), 0 8px 22px var(--shadow);
+      padding:18px;
+    }
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .stack{display:flex; flex-direction:column; gap:12px}
+    label{font-weight:600}
+    input[type="number"]{
+      width:100%; padding:10px; background:var(--panel2); color:var(--text);
+      border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+    }
+    .slider-row{display:grid; grid-template-columns:1fr 80px; gap:10px; align-items:center}
+    input[type="range"]{width:100%}
+    .btn{
+      border:none; border-radius:10px; padding:12px 16px; font-weight:700; cursor:pointer; min-height:44px; color:#0F1224;
+      background:linear-gradient(135deg, #FFD700, #FF8C00, #FF6AC1);
+      box-shadow:0 8px 22px rgba(0,0,0,0.25), 0 6px 18px var(--shadow);
+      transition:transform .12s ease, filter .2s ease;
+    }
+    .btn:hover{filter:saturate(1.08) brightness(1.04)}
+    .note{font-size:.92rem; color:var(--muted)}
+    .error{color:var(--error); font-weight:600}
+    .result-card{
+      background:var(--panel2); border:1px solid rgba(255,255,255,0.12);
+      border-radius:12px; padding:14px;
+    }
+    .result-item{display:flex; justify-content:space-between; margin:6px 0}
+    .toggle{display:flex; align-items:center; gap:10px; margin-top:10px}
+    table{width:100%; border-collapse:collapse; margin-top:10px}
+    th, td{border-bottom:1px solid rgba(255,255,255,0.12); padding:8px; text-align:right; font-size:.95rem}
+    th:first-child, td:first-child{text-align:left}
+    footer{margin-top:20px; text-align:center; color:var(--muted)}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Tools <span>Wonder</span></div>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#emi">Tools</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="home" class="container title">
+    <h1>AI TOOL HUB</h1>
+    <p class="note">EMI Calculator — calculate monthly payments, total interest, and total payout in real time.</p>
+  </section>
+
+  <main id="emi" class="container">
+    <div class="panel">
+      <div class="grid">
+        <div class="stack">
+          <label for="amount">Loan Amount (currency)</label>
+          <div class="slider-row">
+            <input id="amountRange" type="range" min="10000" max="10000000" step="10000" value="500000">
+            <input id="amount" type="number" min="1000" step="1000" value="500000"/>
+          </div>
+
+          <label for="rate">Annual Interest Rate (%)</label>
+          <div class="slider-row">
+            <input id="rateRange" type="range" min="1" max="30" step="0.1" value="12">
+            <input id="rate" type="number" min="0.1" step="0.1" value="12"/>
+          </div>
+
+          <label for="tenureYears">Loan Tenure</label>
+          <div class="slider-row">
+            <input id="tenureRange" type="range" min="6" max="360" step="1" value="120">
+            <input id="tenureMonths" type="number" min="1" step="1" value="120"/>
+          </div>
+          <p class="note">Use the sliders or type exact values. Tenure is in months (e.g., 120 = 10 years).</p>
+
+          <button id="calcBtn" class="btn">Calculate EMI</button>
+          <div id="errorBox" class="error" style="display:none;"></div>
+        </div>
+
+        <div class="stack">
+          <div class="result-card">
+            <div class="result-item">
+              <span>Monthly EMI</span>
+              <strong id="emiValue">—</strong>
+            </div>
+            <div class="result-item">
+              <span>Total Interest</span>
+              <strong id="totalInterest">—</strong>
+            </div>
+            <div class="result-item">
+              <span>Total Payment (Principal + Interest)</span>
+              <strong id="totalPayment">—</strong>
+            </div>
+            <div class="toggle">
+              <input id="showSchedule" type="checkbox">
+              <label for="showSchedule" class="note">Show amortization schedule (optional)</label>
+            </div>
+          </div>
+          <div id="scheduleWrap" class="result-card" style="display:none;">
+            <strong style="display:block; margin-bottom:8px;">Amortization Schedule</strong>
+            <table id="scheduleTable">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>EMI</th>
+                  <th>Interest</th>
+                  <th>Principal</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <footer id="contact">Clean UI • Dark theme • Responsive • Real-time EMI calculation.</footer>
+    </div>
+  </main>
+
+  <script>
+    // Elements
+    const amount = document.getElementById('amount');
+    const amountRange = document.getElementById('amountRange');
+    const rate = document.getElementById('rate');
+    const rateRange = document.getElementById('rateRange');
+    const tenureMonths = document.getElementById('tenureMonths');
+    const tenureRange = document.getElementById('tenureRange');
+    const calcBtn = document.getElementById('calcBtn');
+    const errorBox = document.getElementById('errorBox');
+
+    const emiValue = document.getElementById('emiValue');
+    const totalInterest = document.getElementById('totalInterest');
+    const totalPayment = document.getElementById('totalPayment');
+
+    const showSchedule = document.getElementById('showSchedule');
+    const scheduleWrap = document.getElementById('scheduleWrap');
+    const scheduleTableBody = document.querySelector('#scheduleTable tbody');
+
+    // Sync slider and input
+    function sync(a, b){ a.addEventListener('input', ()=> b.value = a.value); b.addEventListener('input', ()=> a.value = b.value); }
+    sync(amountRange, amount);
+    sync(rateRange, rate);
+    sync(tenureRange, tenureMonths);
+
+    // Format currency helper
+    function fmt(n){
+      return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(n);
+    }
+
+    // Core EMI calculation
+    function calculateEMI(P, annualRate, months){
+      const R = (annualRate/100)/12; // monthly rate
+      if (R === 0) {
+        const emi = P / months;
+        const totalPay = P;
+        const totalInt = 0;
+        return { emi, totalPay, totalInt, R };
+      }
+      const pow = Math.pow(1+R, months);
+      const emi = P * R * pow / (pow - 1);
+      const totalPay = emi * months;
+      const totalInt = totalPay - P;
+      return { emi, totalPay, totalInt, R };
+    }
+
+    // Amortization schedule
+    function buildSchedule(P, R, emi, months){
+      const rows = [];
+      let balance = P;
+      for(let m=1; m<=months; m++){
+        const interest = balance * R;
+        const principal = emi - interest;
+        balance = Math.max(0, balance - principal);
+        rows.push({ m, emi, interest, principal, balance });
+        if (balance <= 0) break;
+      }
+      return rows;
+    }
+
+    // Render schedule table
+    function renderSchedule(rows){
+      scheduleTableBody.innerHTML = '';
+      const frag = document.createDocumentFragment();
+      rows.forEach(r=>{
+        const tr = document.createElement('tr');
+        const tdMonth = document.createElement('td'); tdMonth.textContent = r.m;
+        const tdEmi = document.createElement('td'); tdEmi.textContent = fmt(r.emi);
+        const tdInt = document.createElement('td'); tdInt.textContent = fmt(r.interest);
+        const tdPrin = document.createElement('td'); tdPrin.textContent = fmt(r.principal);
+        const tdBal = document.createElement('td'); tdBal.textContent = fmt(r.balance);
+        tr.append(tdMonth, tdEmi, tdInt, tdPrin, tdBal);
+        frag.appendChild(tr);
+      });
+      scheduleTableBody.appendChild(frag);
+    }
+
+    // Validate and compute
+    function compute(){
+      const P = parseFloat(amount.value);
+      const annualRate = parseFloat(rate.value);
+      const months = parseInt(tenureMonths.value, 10);
+
+      if (isNaN(P) || isNaN(annualRate) || isNaN(months) || P <= 0 || annualRate < 0 || months <= 0){
+        errorBox.textContent = 'Please enter valid positive values (rate can be 0).';
+        errorBox.style.display = 'block';
+        return null;
+      }
+      errorBox.style.display = 'none';
+      const { emi, totalPay, totalInt, R } = calculateEMI(P, annualRate, months);
+
+      emiValue.textContent = `${fmt(emi)}`;
+      totalInterest.textContent = `${fmt(totalInt)}`;
+      totalPayment.textContent = `${fmt(totalPay)}`;
+
+      const rows = buildSchedule(P, R, emi, months);
+      if (showSchedule.checked){
+        scheduleWrap.style.display = 'block';
+        renderSchedule(rows);
+      } else {
+        scheduleWrap.style.display = 'none';
+      }
+      return { emi, totalPay, totalInt, R };
+    }
+
+    // Events
+    calcBtn.addEventListener('click', compute);
+    [amount, amountRange, rate, rateRange, tenureMonths, tenureRange].forEach(el=>{
+      el.addEventListener('input', compute);
+    });
+    showSchedule.addEventListener('change', compute);
+
+    // Initial compute
+    compute();
+  </script>
+</body>
+</html>
