@@ -1,423 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ai Tool Hub — Image Converter</title>
-  <style>
-    :root{
-      --bg:#0F1224;
-      --panel:#1B1E34;
-      --panel-2:#222642;
-      --text:#EAEAEA;
-      --muted:#B9BCD6;
-      --accent:#FFD700;
-      --accent-2:#E6C200;
-      --error:#FF6B6B;
-      --ok:#31C48D;
-      --shadow:rgba(255,215,0,0.18);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
-      background: radial-gradient(1100px 700px at 10% 10%, #3A4CF6 0%, #0F1224 55%, #090A17 100%)
-                  , conic-gradient(from 240deg at 90% 5%, #FF7AC8 0%, #FFD700 28%, #22D3EE 62%, #7C3AED 88%, #FF7AC8 100%);
-      background-blend-mode: screen, normal;
-      color:var(--text);
-      min-height:100vh;
-    }
-    header{
-      position:sticky; top:0; z-index:10;
-      backdrop-filter:saturate(1.1) blur(8px);
-      background:linear-gradient(180deg, rgba(27,30,52,0.85), rgba(27,30,52,0.55));
-      border-bottom:1px solid rgba(255,255,255,0.12);
-      box-shadow:0 8px 22px rgba(0,0,0,0.35);
-    }
-    .topbar{
-      max-width:1100px; margin:0 auto; padding:14px 20px;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .logo{font-weight:700; letter-spacing:.3px}
-    .logo span{color:var(--accent)}
-    .title{
-      text-align:center; padding:26px 20px 10px;
-    }
-    .title h1{
-      margin:0 0 8px;
-      font-size:2.2rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase;
-      background:linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      text-shadow:0 2px 30px rgba(255,255,255,0.08);
-    }
-    .title p{margin:0; opacity:.92}
-    .container{
-      max-width:1100px; margin:0 auto; padding:20px;
-    }
-    .panel{
-      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-      border:1px solid rgba(255,255,255,0.16);
-      backdrop-filter:blur(10px) saturate(1.05);
-      border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,0.35), 0 8px 22px var(--shadow);
-      padding:18px;
-    }
-    .grid{
-      display:grid; grid-template-columns:1fr 1fr; gap:18px;
-    }
-    .stack{display:flex; flex-direction:column; gap:12px}
-    label{font-weight:600}
-    input[type="file"]{
-      color:var(--text);
-      background:var(--panel-2);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:10px; padding:10px;
-    }
-    select{
-      width:100%; padding:10px;
-      background:var(--panel-2); color:var(--text);
-      border:1px solid rgba(255,255,255,0.12); border-radius:10px;
-    }
-    .btn{
-      border:none; border-radius:10px; padding:12px 16px;
-      font-weight:700; cursor:pointer; min-height:44px;
-      color:#0F1224;
-      background:linear-gradient(135deg, #FFD700, #FF8C00, #FF6AC1);
-      box-shadow:0 8px 22px rgba(0,0,0,0.25), 0 6px 18px var(--shadow);
-      transition:transform .12s ease, filter .2s ease;
-    }
-    .btn:hover{filter:saturate(1.15) brightness(1.04)}
-    .btn:active{transform:translateY(1px)}
-    .note{font-size:.92rem; color:var(--muted)}
-    .error{color:var(--error); font-weight:600}
-    .status{
-      padding:10px; border-radius:10px; background:rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-    }
-    .status span{font-weight:700}
-    .preview-wrap{
-      display:grid; grid-template-columns:1fr 1fr; gap:14px;
-    }
-    .preview{
-      background:var(--panel-2);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:12px; overflow:hidden;
-    }
-    .preview-head{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.12);
-      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-    }
-    .preview-body{padding:12px}
-    .preview-body img{max-width:100%; border-radius:8px}
-    .download{
-      display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;
-    }
-    .btn-secondary{
-      border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;
-      color:var(--text);
-      background:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
-      border:1px solid rgba(255,255,255,0.16);
-      transition:transform .12s ease, filter .2s ease;
-    }
-    .btn-secondary:hover{filter:brightness(1.08)}
-    footer{
-      margin-top:26px; text-align:center; color:var(--muted);
-    }
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} .preview-wrap{grid-template-columns:1fr} }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ai Tool Hub — Image Converter</title>
+  <style>
+    :root{
+      --bg:#0F1224;
+      --panel:#1B1E34;
+      --panel-2:#222642;
+      --text:#EAEAEA;
+      --muted:#B9BCD6;
+      --accent:#FFD700;
+      --accent-2:#E6C200;
+      --error:#FF6B6B;
+      --ok:#31C48D;
+      --shadow:rgba(255,215,0,0.18);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+      background: radial-gradient(1100px 700px at 10% 10%, #3A4CF6 0%, #0F1224 55%, #090A17 100%)
+                  , conic-gradient(from 240deg at 90% 5%, #FF7AC8 0%, #FFD700 28%, #22D3EE 62%, #7C3AED 88%, #FF7AC8 100%);
+      background-blend-mode: screen, normal;
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter:saturate(1.1) blur(8px);
+      background:linear-gradient(180deg, rgba(27,30,52,0.85), rgba(27,30,52,0.55));
+      border-bottom:1px solid rgba(255,255,255,0.12);
+      box-shadow:0 8px 22px rgba(0,0,0,0.35);
+    }
+    .topbar{
+      max-width:1100px; margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .logo{font-weight:700; letter-spacing:.3px}
+    .logo span{color:var(--accent)}
+    .title{
+      text-align:center; padding:26px 20px 10px;
+    }
+    .title h1{
+      margin:0 0 8px;
+      font-size:2.2rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase;
+      background:linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-shadow:0 2px 30px rgba(255,255,255,0.08);
+    }
+    .title p{margin:0; opacity:.92}
+    .container{
+      max-width:1100px; margin:0 auto; padding:20px;
+    }
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border:1px solid rgba(255,255,255,0.16);
+      backdrop-filter:blur(10px) saturate(1.05);
+      border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,0.35), 0 8px 22px var(--shadow);
+      padding:18px;
+    }
+    .grid{
+      display:grid; grid-template-columns:1fr 1fr; gap:18px;
+    }
+    .stack{display:flex; flex-direction:column; gap:12px}
+    label{font-weight:600}
+    input[type="file"]{
+      color:var(--text);
+      background:var(--panel-2);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:10px; padding:10px;
+    }
+    select{
+      width:100%; padding:10px;
+      background:var(--panel-2); color:var(--text);
+      border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+    }
+    .btn{
+      border:none; border-radius:10px; padding:12px 16px;
+      font-weight:700; cursor:pointer; min-height:44px;
+      color:#0F1224;
+      background:linear-gradient(135deg, #FFD700, #FF8C00, #FF6AC1);
+      box-shadow:0 8px 22px rgba(0,0,0,0.25), 0 6px 18px var(--shadow);
+      transition:transform .12s ease, filter .2s ease;
+    }
+    .btn:hover{filter:saturate(1.15) brightness(1.04)}
+    .btn:active{transform:translateY(1px)}
+    .note{font-size:.92rem; color:var(--muted)}
+    .error{color:var(--error); font-weight:600}
+    .status{
+      padding:10px; border-radius:10px; background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+    }
+    .status span{font-weight:700}
+    .preview-wrap{
+      display:grid; grid-template-columns:1fr 1fr; gap:14px;
+    }
+    .preview{
+      background:var(--panel-2);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:12px; overflow:hidden;
+    }
+    .preview-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.12);
+      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    }
+    .preview-body{padding:12px}
+    .preview-body img{max-width:100%; border-radius:8px}
+    .download{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;
+    }
+    .btn-secondary{
+      border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;
+      color:var(--text);
+      background:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+      border:1px solid rgba(255,255,255,0.16);
+      transition:transform .12s ease, filter .2s ease;
+    }
+    .btn-secondary:hover{filter:brightness(1.08)}
+    footer{
+      margin-top:26px; text-align:center; color:var(--muted);
+    }
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} .preview-wrap{grid-template-columns:1fr} }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="topbar">
-      <div class="logo">Tools <span>Wonder</span></div>
-      <nav aria-label="Main navigation">
-        <a href="#" style="color:var(--text); text-decoration:none; margin-left:12px">Home</a>
-        <a href="#" style="color:var(--text); text-decoration:none; margin-left:12px">Tools</a>
-        <a href="#" style="color:var(--text); text-decoration:none; margin-left:12px">Contact</a>
-      </nav>
-    </div>
-  </header>
+  <header>
+    <div class="topbar">
+      <div class="logo">Tools <span>Wonder</span></div>
+      <nav aria-label="Main navigation">
+        <a href="#" style="color:var(--text); text-decoration:none; margin-left:12px">Home</a>
+        <a href="#" style="color:var(--text); text-decoration:none; margin-left:12px">Tools</a>
+        <a href="#" style="color:var(--text); text-decoration:none; margin-left:12px">Contact</a>
+      </nav>
+    </div>
+  </header>
 
-  <section class="title">
-    <h1>AI TOOL HUB</h1>
-    <p>Image Converter — upload, convert, preview, and download in a clean, modern interface.</p>
-  </section>
+  <section class="title">
+    <h1>AI TOOL HUB</h1>
+    <p>Image Converter — upload, convert, preview, and download in a clean, modern interface.</p>
+  </section>
 
-  <main class="container">
-    <div class="panel">
-      <div class="grid">
-        <div class="stack">
-          <label for="fileInput">Upload image</label>
-          <input id="fileInput" type="file" accept=".png,.jpg,.jpeg,.bmp,.gif,.tif,.tiff,.webp,image/*" />
-          <div class="note">
-            Supported inputs: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP. Large images may take longer to process.
-          </div>
+  <main class="container">
+    <div class="panel">
+      <div class="grid">
+        <div class="stack">
+          <label for="fileInput">Upload image</label>
+          <input id="fileInput" type="file" accept=".png,.jpg,.jpeg,.bmp,.gif,.tif,.tiff,.webp,image/*" />
+          <div class="note">
+            Supported inputs: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP. Large images may take longer to process.
+          </div>
 
-          <label for="formatSelect">Output format</label>
-          <select id="formatSelect">
-            <option value="png">PNG</option>
-            <option value="jpeg">JPG / JPEG</option>
-            <option value="webp">WEBP</option>
-            <option value="pdf">PDF (preview as image, download as PDF)</option>
-            <option value="bmp">BMP (requires server/library)</option>
-            <option value="gif">GIF (requires server/library)</option>
-            <option value="tiff">TIFF (requires server/library)</option>
-          </select>
+          <label for="formatSelect">Output format</label>
+          <select id="formatSelect">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPG / JPEG</option>
+            <option value="webp">WEBP</option>
+            <option value="pdf">PDF (preview as image, download as PDF)</option>
+            <option value="bmp">BMP (requires server/library)</option>
+            <option value="gif">GIF (requires server/library)</option>
+            <option value="tiff">TIFF (requires server/library)</option>
+          </select>
 
-          <button id="convertBtn" class="btn">Convert</button>
-          <div id="status" class="status" style="display:none;">
-            <span>Processing image...</span> Please wait.
-          </div>
-          <div id="errorBox" class="error" style="display:none;"></div>
-        </div>
+          <button id="convertBtn" class="btn">Convert</button>
+          <div id="status" class="status" style="display:none;">
+            <span>Processing image...</span> Please wait.
+          </div>
+          <div id="errorBox" class="error" style="display:none;"></div>
+        </div>
 
-        <div class="stack">
-          <div class="preview-wrap">
-            <div class="preview" id="inputPreview" style="display:none;">
-              <div class="preview-head">
-                <strong>Input preview</strong>
-                <span id="inputMeta" class="note"></span>
-              </div>
-              <div class="preview-body">
-                <img id="inputImg" alt="Input preview" />
-              </div>
-            </div>
+        <div class="stack">
+          <div class="preview-wrap">
+            <div class="preview" id="inputPreview" style="display:none;">
+              <div class="preview-head">
+                <strong>Input preview</strong>
+                <span id="inputMeta" class="note"></span>
+              </div>
+              <div class="preview-body">
+                <img id="inputImg" alt="Input preview" />
+              </div>
+            </div>
 
-            <div class="preview" id="outputPreview" style="display:none;">
-              <div class="preview-head">
-                <strong>Output preview</strong>
-                <span id="outputMeta" class="note"></span>
-              </div>
-              <div class="preview-body">
-                <img id="outputImg" alt="Output preview" />
-                <div class="download">
-                  <a id="downloadLink" class="btn-secondary" href="#" download>Download converted file</a>
-                  <button id="resetBtn" class="btn-secondary">Reset</button>
-                </div>
-                <div id="formatNote" class="note" style="margin-top:6px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            <div class="preview" id="outputPreview" style="display:none;">
+              <div class="preview-head">
+                <strong>Output preview</strong>
+                <span id="outputMeta" class="note"></span>
+              </div>
+              <div class="preview-body">
+                <img id="outputImg" alt="Output preview" />
+                <div class="download">
+                  <a id="downloadLink" class="btn-secondary" href="#" download>Download converted file</a>
+                  <button id="resetBtn" class="btn-secondary">Reset</button>
+                </div>
+                <div id="formatNote" class="note" style="margin-top:6px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <footer>
-        Clean UI • Dark theme • Responsive • Client-side conversion (PNG, JPEG, WEBP). Others may need server/library.
-      </footer>
-    </div>
-  </main>
+      <footer>
+        Clean UI • Dark theme • Responsive • Client-side conversion (PNG, JPEG, WEBP). Others may need server/library.
+      </footer>
+    </div>
+  </main>
 
-  <script>
-    const fileInput = document.getElementById('fileInput');
-    const formatSelect = document.getElementById('formatSelect');
-    const convertBtn = document.getElementById('convertBtn');
-    const statusBox = document.getElementById('status');
-    const errorBox = document.getElementById('errorBox');
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const formatSelect = document.getElementById('formatSelect');
+    const convertBtn = document.getElementById('convertBtn');
+    const statusBox = document.getElementById('status');
+    const errorBox = document.getElementById('errorBox');
 
-    const inputPreview = document.getElementById('inputPreview');
-    const inputImg = document.getElementById('inputImg');
-    const inputMeta = document.getElementById('inputMeta');
+    const inputPreview = document.getElementById('inputPreview');
+    const inputImg = document.getElementById('inputImg');
+    const inputMeta = document.getElementById('inputMeta');
 
-    const outputPreview = document.getElementById('outputPreview');
-    const outputImg = document.getElementById('outputImg');
-    const outputMeta = document.getElementById('outputMeta');
-    const downloadLink = document.getElementById('downloadLink');
-    const resetBtn = document.getElementById('resetBtn');
-    const formatNote = document.getElementById('formatNote');
+    const outputPreview = document.getElementById('outputPreview');
+    const outputImg = document.getElementById('outputImg');
+    const outputMeta = document.getElementById('outputMeta');
+    const downloadLink = document.getElementById('downloadLink');
+    const resetBtn = document.getElementById('resetBtn');
+    const formatNote = document.getElementById('formatNote');
 
-    let originalImage = null; // Image Element
-    let originalName = null;  // Base file name
+    let originalImage = null; // Image Element
+    let originalName = null;  // Base file name
 
-    // Helper: read file as dataURL
-    function readFile(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsDataURL(file);
-      });
-    }
+    // Helper: read file as dataURL
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
 
-    // Helper: load image element from dataURL
-    function loadImage(dataURL) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error('Unsupported or corrupted image'));
-        // CORS hint (for remote URLs):
-        img.crossOrigin = 'anonymous';
-        img.src = dataURL;
-      });
-    }
+    // Helper: load image element from dataURL
+    function loadImage(dataURL) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Unsupported or corrupted image'));
+        // CORS hint (for remote URLs):
+        img.crossOrigin = 'anonymous';
+        img.src = dataURL;
+      });
+    }
 
-    // Helper: canvas convert (png/jpeg/webp)
-    function canvasConvert(img, targetFormat, quality = 0.92) {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const mime = ({
-        png: 'image/png',
-        jpeg: 'image/jpeg',
-        webp: 'image/webp'
-      })[targetFormat];
-      if (!mime) return null;
-      const dataURL = canvas.toDataURL(mime, quality);
-      return { dataURL, mime, width: canvas.width, height: canvas.height };
-    }
+    // Helper: canvas convert (png/jpeg/webp)
+    function canvasConvert(img, targetFormat, quality = 0.92) {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const mime = ({
+        png: 'image/png',
+        jpeg: 'image/jpeg',
+        webp: 'image/webp'
+      })[targetFormat];
+      if (!mime) return null;
+      const dataURL = canvas.toDataURL(mime, quality);
+      return { dataURL, mime, width: canvas.width, height: canvas.height };
+    }
 
-    // Minimal PDF generator (single image page) without external libraries
-    // Creates a basic PDF that embeds the image as JPEG/PNG.
-    function makeSimplePDF(img) {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
+    // Minimal PDF generator (single image page) without external libraries
+    // Creates a basic PDF that embeds the image as JPEG/PNG.
+    function makeSimplePDF(img) {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
 
-      // Convert to JPEG for embedding
-      const jpegData = canvas.toDataURL('image/jpeg', 0.92);
-      const base64 = jpegData.split(',')[1];
-      const binary = atob(base64);
-      const len = binary.length;
-      const imgBytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) imgBytes[i] = binary.charCodeAt(i);
+      // Convert to JPEG for embedding
+      const jpegData = canvas.toDataURL('image/jpeg', 0.92);
+      const base64 = jpegData.split(',')[1];
+      const binary = atob(base64);
+      const len = binary.length;
+      const imgBytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) imgBytes[i] = binary.charCodeAt(i);
 
-      // Very basic PDF objects (A4-like page sizing based on image px)
-      // Note: This is a minimalist approach and may not handle all edge-cases.
-      const width = img.naturalWidth;
-      const height = img.naturalHeight;
-      const pdfHeader = `%PDF-1.3\n`;
-      const objects = [];
-      const offsets = [];
+      // Very basic PDF objects (A4-like page sizing based on image px)
+      // Note: This is a minimalist approach and may not handle all edge-cases.
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
+      const pdfHeader = '%PDF-1.3\n';
+      const objects = [];
+      const offsets = [];
 
-      function addObject(str) {
-        offsets.push(objects.join('').length + pdfHeader.length);
-        objects.push(str);
-      }
+      function addObject(str) {
+        offsets.push(objects.join('').length + pdfHeader.length);
+        objects.push(str);
+      }
 
-      addObject(`1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n`);
-      addObject(`2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n`);
-      addObject(`3 0 obj << /Type /Page /Parent 2 0 R /Resources << /XObject << /Im0 4 0 R >> >> /MediaBox [0 0 ${width} ${height}] /Contents 5 0 R >> endobj\n`);
-      addObject(`4 0 obj << /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >> stream\n`);
-      objects.push(imgBytes.reduce((acc, b) => acc + String.fromCharCode(b), ''));
-      objects.push(`\nendstream\nendobj\n`);
-      addObject(`5 0 obj << /Length 46 >> stream\nq\n${width} 0 0 ${height} 0 0 cm\n/Im0 Do\nQ\nendstream\nendobj\n`);
+      addObject('1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n');
+      addObject('2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n');
+      addObject('3 0 obj << /Type /Page /Parent 2 0 R /Resources << /XObject << /Im0 4 0 R >> >> /MediaBox [0 0 ${width} ${height}] /Contents 5 0 R >> endobj\n');
+      addObject('4 0 obj << /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >> stream\n');
+      objects.push(imgBytes.reduce((acc, b) => acc + String.fromCharCode(b), ''));
+      objects.push('\nendstream\nendobj\n');
+      addObject('5 0 obj << /Length 46 >> stream\nq\n${width} 0 0 ${height} 0 0 cm\n/Im0 Do\nQ\nendstream\nendobj\n');
 
-      // xref
-      const body = objects.join('');
-      const xrefOffset = pdfHeader.length + body.length;
-      let xref = `xref\n0 6\n0000000000 65535 f \n`;
-      for (let i = 0; i < offsets.length; i++) {
-        const off = String(offsets[i]).padStart(10, '0');
-        xref += `${off} 00000 n \n`;
-      }
-      const trailer = `trailer << /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+      // xref
+      const body = objects.join('');
+      const xrefOffset = pdfHeader.length + body.length;
+      let xref = 'xref\n0 6\n0000000000 65535 f \n';
+      for (let i = 0; i < offsets.length; i++) {
+        const off = String(offsets[i]).padStart(10, '0');
+        xref += '${off} 00000 n \n';
+      }
+      const trailer = 'trailer << /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF';
 
-      const pdfBlob = new Blob([pdfHeader, body, xref, trailer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(pdfBlob);
-      return { url, mime: 'application/pdf', width, height };
-    }
+      const pdfBlob = new Blob([pdfHeader, body, xref, trailer], { type: 'application/pdf' });
+      const url = URL.createObjectURL(pdfBlob);
+      return { url, mime: 'application/pdf', width, height };
+    }
 
-    // Show input preview on file select
-    fileInput.addEventListener('change', async (e) => {
-      errorBox.style.display = 'none';
-      const file = e.target.files?.[0];
-      if (!file) return;
+    // Show input preview on file select
+    fileInput.addEventListener('change', async (e) => {
+      errorBox.style.display = 'none';
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-      // Validate type and size
-      const validTypes = ['image/png','image/jpeg','image/jpg','image/webp','image/gif','image/bmp','image/tiff'];
-      if (!validTypes.includes(file.type)) {
-        errorBox.textContent = 'Unsupported file type. Please upload PNG, JPG/JPEG, BMP, GIF, TIFF, or WEBP.';
-        errorBox.style.display = 'block';
-        inputPreview.style.display = 'none';
-        outputPreview.style.display = 'none';
-        return;
-      }
-      if (file.size > 20 * 1024 * 1024) { // 20MB
-        errorBox.textContent = 'File too large (over 20MB). Please choose a smaller image.';
-        errorBox.style.display = 'block';
-        inputPreview.style.display = 'none';
-        outputPreview.style.display = 'none';
-        return;
-      }
+      // Validate type and size
+      const validTypes = ['image/png','image/jpeg','image/jpg','image/webp','image/gif','image/bmp','image/tiff'];
+      if (!validTypes.includes(file.type)) {
+        errorBox.textContent = 'Unsupported file type. Please upload PNG, JPG/JPEG, BMP, GIF, TIFF, or WEBP.';
+        errorBox.style.display = 'block';
+        inputPreview.style.display = 'none';
+        outputPreview.style.display = 'none';
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) { // 20MB
+        errorBox.textContent = 'File too large (over 20MB). Please choose a smaller image.';
+        errorBox.style.display = 'block';
+        inputPreview.style.display = 'none';
+        outputPreview.style.display = 'none';
+        return;
+      }
 
-      try {
-        const dataURL = await readFile(file);
-        originalImage = await loadImage(dataURL);
-        originalName = (file.name || 'image').replace(/\.[^.]+$/, '');
+      try {
+        const dataURL = await readFile(file);
+        originalImage = await loadImage(dataURL);
+        originalName = (file.name || 'image').replace(/\.[^.]+$/, '');
 
-        inputImg.src = dataURL;
-        inputPreview.style.display = 'block';
-        inputMeta.textContent = `${file.type} • ${(file.size/1024).toFixed(1)} KB • ${originalImage.naturalWidth}×${originalImage.naturalHeight}px`;
-        outputPreview.style.display = 'none';
-      } catch (err) {
-        errorBox.textContent = 'Failed to load image. Try a different file.';
-        errorBox.style.display = 'block';
-        inputPreview.style.display = 'none';
-      }
-    });
+        inputImg.src = dataURL;
+        inputPreview.style.display = 'block';
+        inputMeta.textContent = `${file.type} • ${(file.size/1024).toFixed(1)} KB • ${originalImage.naturalWidth}×${originalImage.naturalHeight}px`;
+        outputPreview.style.display = 'none';
+      } catch (err) {
+        errorBox.textContent = 'Failed to load image. Try a different file.';
+        errorBox.style.display = 'block';
+        inputPreview.style.display = 'none';
+      }
+    });
 
-    // Convert button
-    convertBtn.addEventListener('click', async () => {
-      errorBox.style.display = 'none';
-      formatNote.textContent = '';
-      if (!originalImage) {
-        errorBox.textContent = 'Please upload an image first.';
-        errorBox.style.display = 'block';
-        return;
-      }
-      const fmt = formatSelect.value;
-      statusBox.style.display = 'block';
-      outputPreview.style.display = 'none';
+    // Convert button
+    convertBtn.addEventListener('click', async () => {
+      errorBox.style.display = 'none';
+      formatNote.textContent = '';
+      if (!originalImage) {
+        errorBox.textContent = 'Please upload an image first.';
+        errorBox.style.display = 'block';
+        return;
+      }
+      const fmt = formatSelect.value;
+      statusBox.style.display = 'block';
+      outputPreview.style.display = 'none';
 
-      try {
-        let result = null;
-        if (fmt === 'png' || fmt === 'jpeg' || fmt === 'webp') {
-          result = canvasConvert(originalImage, fmt, 0.92);
-          if (!result || !result.dataURL) throw new Error('Conversion failed');
-          outputImg.src = result.dataURL;
-          outputMeta.textContent = `${result.mime} • ${result.width}×${result.height}px`;
-          downloadLink.href = result.dataURL;
-          const ext = fmt === 'jpeg' ? 'jpg' : fmt;
-          downloadLink.download = `${originalName}.${ext}`;
-          formatNote.textContent = 'Converted with Canvas API.';
-        } else if (fmt === 'pdf') {
-          const pdf = makeSimplePDF(originalImage);
-          outputImg.src = originalImage.src; // preview uses image; download is PDF
-          outputMeta.textContent = `application/pdf • ${pdf.width}×${pdf.height}px (1 page)`;
-          downloadLink.href = pdf.url;
-          downloadLink.download = `${originalName}.pdf`;
-          formatNote.textContent = 'Generated a simple single-page PDF with embedded image.';
-        } else {
-          outputImg.src = originalImage.src;
-          outputMeta.textContent = 'Preview only';
-          downloadLink.href = '#';
-          downloadLink.onclick = (e) => e.preventDefault();
-          formatNote.textContent = 'BMP/GIF/TIFF export is not supported in pure client-side Canvas. Use server-side conversion or a dedicated library.';
-        }
+      try {
+        let result = null;
+        if (fmt === 'png' || fmt === 'jpeg' || fmt === 'webp') {
+          // यी फर्म्याटहरूले राम्रोसँग काम गर्छ
+          result = canvasConvert(originalImage, fmt, 0.92);
+          if (!result || !result.dataURL) throw new Error('Conversion failed');
+          outputImg.src = result.dataURL;
+          outputMeta.textContent = `${result.mime} • ${result.width}×${result.height}px`;
+          downloadLink.href = result.dataURL;
+          const ext = fmt === 'jpeg' ? 'jpg' : fmt;
+          downloadLink.download = `${originalName}.${ext}`;
+          downloadLink.onclick = null; // डाउनलोड सक्षम गर्न महत्त्वपूर्ण
+          formatNote.textContent = 'Converted with Canvas API.';
+        } else if (fmt === 'pdf') {
+          // PDF ले पनि राम्रोसँग काम गर्छ
+          const pdf = makeSimplePDF(originalImage);
+          outputImg.src = originalImage.src; // preview uses image; download is PDF
+          outputMeta.textContent = `application/pdf • ${pdf.width}×${pdf.height}px (1 page)`;
+          downloadLink.href = pdf.url;
+          downloadLink.download = `${originalName}.pdf`;
+          downloadLink.onclick = null; // डाउनलोड सक्षम गर्न महत्त्वपूर्ण
+          formatNote.textContent = 'Generated a simple single-page PDF with embedded image.';
+        } else {
+          // *** यहाँ समस्या छ ***
+          // BMP, GIF, र TIFF को लागि, डाउनलोड जानाजानी असक्षम गरिएको छ।
+          outputImg.src = originalImage.src;
+          outputMeta.textContent = 'Preview only';
+          downloadLink.href = '#';
+          downloadLink.onclick = (e) => e.preventDefault(); // <-- यसले डाउनलोड रोक्छ
+          formatNote.textContent = 'BMP/GIF/TIFF export is not supported in pure client-side Canvas. Use server-side conversion or a dedicated library.';
+        }
 
-        outputPreview.style.display = 'block';
-      } catch (err) {
-        errorBox.textContent = 'Conversion error. Please try a different format or smaller image.';
-        errorBox.style.display = 'block';
-      } finally {
-        statusBox.style.display = 'none';
-      }
-    });
+        outputPreview.style.display = 'block';
+  S   } catch (err) {
+        errorBox.textContent = 'Conversion error. Please try a different format or smaller image.';
+        errorBox.style.display = 'block';
+      } finally {
+        statusBox.style.display = 'none';
+      }
+    });
 
-    // Reset
-    resetBtn.addEventListener('click', () => {
-      fileInput.value = '';
-      originalImage = null;
-      originalName = null;
-      inputPreview.style.display = 'none';
-      outputPreview.style.display = 'none';
-      errorBox.style.display = 'none';
-      statusBox.style.display = 'none';
-      formatNote.textContent = '';
-    });
-  </script>
+    // Reset
+    resetBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      originalImage = null;
+      originalName = null;
+      inputPreview.style.display = 'none';
+      outputPreview.style.display = 'none';
+      errorBox.style.display = 'none';
+      statusBox.style.display = 'none';
+      formatNote.textContent = '';
+    });
+  </script>
 </body>
-</html>
+              </html>
