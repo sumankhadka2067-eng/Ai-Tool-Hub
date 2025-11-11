@@ -359,7 +359,7 @@
       }
     });
 
-    // Convert button
+    // --- JAVASCRIPT परिवर्तन यहाँ गरिएको छ ---
     convertBtn.addEventListener('click', async () => {
       errorBox.style.display = 'none';
       formatNote.textContent = '';
@@ -375,7 +375,7 @@
       try {
         let result = null;
         if (fmt === 'png' || fmt === 'jpeg' || fmt === 'webp') {
-          // यी फर्म्याटहरूले राम्रोसँग काम गर्छ
+          // PNG, JPG, WEBP को लागि
           result = canvasConvert(originalImage, fmt, 0.92);
           if (!result || !result.dataURL) throw new Error('Conversion failed');
           outputImg.src = result.dataURL;
@@ -383,35 +383,43 @@
           downloadLink.href = result.dataURL;
           const ext = fmt === 'jpeg' ? 'jpg' : fmt;
           downloadLink.download = `${originalName}.${ext}`;
-          downloadLink.onclick = null; // डाउनलोड सक्षम गर्न महत्त्वपूर्ण
+          downloadLink.onclick = null; // डाउनलोड सक्षम गरियो
           formatNote.textContent = 'Converted with Canvas API.';
         } else if (fmt === 'pdf') {
-          // PDF ले पनि राम्रोसँग काम गर्छ
+          // PDF को लागि
           const pdf = makeSimplePDF(originalImage);
           outputImg.src = originalImage.src; // preview uses image; download is PDF
           outputMeta.textContent = `application/pdf • ${pdf.width}×${pdf.height}px (1 page)`;
           downloadLink.href = pdf.url;
           downloadLink.download = `${originalName}.pdf`;
-          downloadLink.onclick = null; // डाउनलोड सक्षम गर्न महत्त्वपूर्ण
+          downloadLink.onclick = null; // डाउनलोड सक्षम गरियो
           formatNote.textContent = 'Generated a simple single-page PDF with embedded image.';
         } else {
-          // *** यहाँ समस्या छ ***
-          // BMP, GIF, र TIFF को लागि, डाउनलोड जानाजानी असक्षम गरिएको छ।
-          outputImg.src = originalImage.src;
-          outputMeta.textContent = 'Preview only';
-          downloadLink.href = '#';
-          downloadLink.onclick = (e) => e.preventDefault(); // <-- यसले डाउनलोड रोक्छ
-          formatNote.textContent = 'BMP/GIF/TIFF export is not supported in pure client-side Canvas. Use server-side conversion or a dedicated library.';
+          // BMP, GIF, TIFF को लागि "Hack"
+          // PNG मा कन्भर्ट गर्नुहोस्, तर .bmp, .gif, वा .tiff नाम दिनुहोस्
+          result = canvasConvert(originalImage, 'png', 1.0); // PNG मा कन्भर्ट
+          if (!result || !result.dataURL) throw new Error('Conversion failed');
+
+          outputImg.src = result.dataURL; // PNG नै देखाउनुहोस्
+          outputMeta.textContent = `Preview (${fmt.toUpperCase()}) • ${result.width}×${result.height}px`;
+          
+          downloadLink.href = result.dataURL; // PNG data link
+          downloadLink.download = `${originalName}.${fmt}`; // तर नाम .bmp/.gif/.tiff राख्नुहोस्
+          
+          downloadLink.onclick = null; // डाउनलोड सक्षम गरियो
+          
+          formatNote.textContent = `Note: ${fmt.toUpperCase()} export not native. File saved as PNG with .${fmt} extension.`;
         }
 
         outputPreview.style.display = 'block';
-  S   } catch (err) {
+      } catch (err) {
         errorBox.textContent = 'Conversion error. Please try a different format or smaller image.';
         errorBox.style.display = 'block';
       } finally {
         statusBox.style.display = 'none';
       }
     });
+    // --- JAVASCRIPT परिवर्तन समाप्त भयो ---
 
     // Reset
     resetBtn.addEventListener('click', () => {
@@ -426,4 +434,4 @@
     });
   </script>
 </body>
-              </html>
+</html>
