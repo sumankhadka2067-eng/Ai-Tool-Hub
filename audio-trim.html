@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Ai Tool Hub — Audio Trim Tool</title>
+  <style>
+    :root {
+      --bg:#0F1224; --panel:#1B1E34; --text:#EAEAEA;
+      --accent:#FFD700; --error:#FF6B6B; --shadow:rgba(255,215,0,0.18);
+    }
+    body {
+      margin:0; font-family:'Segoe UI',sans-serif;
+      background:linear-gradient(135deg,#0F1224,#1B1E34); color:var(--text);
+    }
+    header {
+      background:var(--panel); padding:16px 24px;
+      display:flex; justify-content:space-between; align-items:center;
+      box-shadow:0 4px 14px var(--shadow);
+    }
+    .logo {font-weight:bold; font-size:1.2rem; color:var(--accent);}
+    nav a {margin-left:16px; color:var(--text); text-decoration:none;}
+    .container {max-width:700px; margin:auto; padding:20px;}
+    .panel {
+      background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
+      border-radius:12px; padding:20px; box-shadow:0 8px 22px var(--shadow);
+    }
+    label {display:block; margin-top:10px; font-weight:600;}
+    input,button {
+      margin-top:6px; padding:10px; border-radius:8px; border:none;
+      width:100%; font-size:1rem;
+    }
+    input {background:#222642; color:var(--text);}
+    button {
+      background:linear-gradient(90deg,purple,blue,green,yellow);
+      color:var(--text); font-weight:bold; cursor:pointer;
+    }
+    button:hover {transform:scale(1.05);}
+    .error {color:var(--error); font-weight:bold; margin-top:10px;}
+    .results {margin-top:20px;}
+    audio {width:100%; margin-top:10px;}
+    @media(max-width:600px){.container{padding:10px;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Tools Wonder</div>
+    <nav>
+      <a href="#">Home</a><a href="#">Tools</a><a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Audio Trim Tool</h1>
+    <div class="panel">
+      <label for="audioFile">Upload Audio File</label>
+      <input type="file" id="audioFile" accept=".mp3,.wav,.aac,.ogg,.flac,audio/*"/>
+
+      <label for="startTime">Start Time (HH:MM:SS)</label>
+      <input type="text" id="startTime" placeholder="00:00:00"/>
+
+      <label for="endTime">End Time (HH:MM:SS)</label>
+      <input type="text" id="endTime" placeholder="00:00:10"/>
+
+      <button id="trimBtn">Trim</button>
+      <div id="status" style="display:none;">Processing...</div>
+      <div id="errorBox" class="error" style="display:none;"></div>
+
+      <div class="results" id="results" style="display:none;">
+        <h3>Trimmed Audio Preview:</h3>
+        <audio id="outputAudio" controls></audio>
+        <a id="downloadLink" href="#" download="trimmed.wav">Download Trimmed Audio</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audioFileInput = document.getElementById('audioFile');
+    const startTimeInput = document.getElementById('startTime');
+    const endTimeInput = document.getElementById('endTime');
+    const trimBtn = document.getElementById('trimBtn');
+    const statusBox = document.getElementById('status');
+    const errorBox = document.getElementById('errorBox');
+    const results = document.getElementById('results');
+    const outputAudio = document.getElementById('outputAudio');
+    const downloadLink = document.getElementById('downloadLink');
+
+    let audioBuffer = null;
+    let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let fileName = "audio";
+
+    audioFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      fileName = file.name.replace(/\.[^.]+$/, '');
+      const arrayBuffer = await file.arrayBuffer();
+      try {
+        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        errorBox.style.display = "none";
+      } catch (err) {
+        errorBox.textContent = "Unsupported audio format.";
+        errorBox.style.display = "block";
+      }
+    });
+
+    function parseTime(str){
+      const parts = str.split(':').map(p=>parseInt(p,10));
+      if(parts.length!==3 || parts.some(isNaN)) return null;
+      return parts[0]*3600 + parts[1]*60 + parts[2];
+    }
+
+    trimBtn.addEventListener('click', async () => {
+      if(!audioBuffer){
+        errorBox.textContent="Please upload an audio file first.";
+        errorBox.style.display="block"; return;
+      }
+      const startSec = parseTime(startTimeInput.value);
+      const endSec = parseTime(endTimeInput.value);
+      if(startSec===null || endSec===null || startSec>=endSec || endSec>audioBuffer.duration){
+        errorBox.textContent="Invalid start/end times.";
+        errorBox.style.display="block"; return;
+      }
+      errorBox.style.display="none";
+      statusBox.style.display="block";
+
+      const length = endSec - startSec;
+      const trimmedBuffer = audioContext.createBuffer(
+        audioBuffer.numberOfChannels,
+        audioContext.sampleRate * length,
+        audioContext.sampleRate
+      );
+      for(let ch=0; ch<audioBuffer.numberOfChannels; ch++){
+        const channelData = audioBuffer.getChannelData(ch).slice(
+          startSec*audioContext.sampleRate,
+          endSec*audioContext.sampleRate
+        );
+        trimmedBuffer.copyToChannel(channelData, ch, 0);
+      }
+
+      // Export trimmed buffer to WAV
+      function bufferToWave(abuffer, len) {
+        const numOfChan = abuffer.numberOfChannels,
+              length = len * numOfChan * 2 + 44,
+              buffer = new ArrayBuffer(length),
+              view = new DataView(buffer),
+              channels = [],
+              sampleRate = abuffer.sampleRate;
+        let offset = 0;
+        let pos = 0;
+
+        function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+        function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+        // RIFF header
+        setUint32(0x46464952); // "RIFF"
+        setUint32(length - 8);
+        setUint32(0x45564157); // "WAVE"
+
+        // fmt chunk
+        setUint32(0x20746d66); // "fmt "
+        setUint32(16);
+        setUint16(1);
+        setUint16(numOfChan);
+        setUint32(sampleRate);
+        setUint32(sampleRate * 2 * numOfChan);
+        setUint16(numOfChan * 2);
+        setUint16(16);
+
+        // data chunk
+        setUint32(0x61746164); // "data"
+        setUint32(length - pos - 4);
+
+        for (let i = 0; i < numOfChan; i++)
+          channels.push(abuffer.getChannelData(i));
+
+        while (pos < length) {
+          for (let i = 0; i < numOfChan; i++) {
+            let sample = Math.max(-1, Math.min(1, channels[i][offset]));
+            sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+            view.setInt16(pos, sample, true);
+            pos += 2;
+          }
+          offset++;
+        }
+        return buffer;
+      }
+
+      const wavBuffer = bufferToWave(trimmedBuffer, trimmedBuffer.length);
+      const blob = new Blob([wavBuffer], { type: "audio/wav" });
+      const url = URL.createObjectURL(blob);
+
+      outputAudio.src = url;
+      downloadLink.href = url;
+      downloadLink.download = fileName + "-trimmed.wav";
+
+      results.style.display="block";
+      statusBox.style.display="none";
+    });
+  </script>
+</body>
+</html>
