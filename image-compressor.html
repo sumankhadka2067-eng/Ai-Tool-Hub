@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ai Tool Hub — Image Compressor</title>
+  <style>
+    :root{
+      --bg:#0F1224;
+      --panel:#1B1E34;
+      --panel-2:#222642;
+      --text:#EAEAEA;
+      --muted:#B9BCD6;
+      --accent:#FFD700;
+      --accent-2:#E6C200;
+      --error:#FF6B6B;
+      --ok:#31C48D;
+      --shadow:rgba(255,215,0,0.18);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+      background: radial-gradient(1100px 700px at 10% 10%, #3A4CF6 0%, #0F1224 55%, #090A17 100%)
+                  , conic-gradient(from 240deg at 90% 5%, #FF7AC8 0%, #FFD700 28%, #22D3EE 62%, #7C3AED 88%, #FF7AC8 100%);
+      background-blend-mode: screen, normal;
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter:saturate(1.1) blur(8px);
+      background:linear-gradient(180deg, rgba(27,30,52,0.85), rgba(27,30,52,0.55));
+      border-bottom:1px solid rgba(255,255,255,0.12);
+      box-shadow:0 8px 22px rgba(0,0,0,0.35);
+    }
+    .topbar{
+      max-width:1100px; margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .logo{font-weight:700; letter-spacing:.3px}
+    .logo span{color:var(--accent)}
+    .title{
+      text-align:center; padding:26px 20px 10px;
+    }
+    .title h1{
+      margin:0 0 8px;
+      font-size:2.2rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase;
+      background:linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      text-shadow:0 2px 30px rgba(255,255,255,0.08);
+    }
+    .title p{margin:0; opacity:.92}
+    .container{max-width:1100px; margin:0 auto; padding:20px}
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border:1px solid rgba(255,255,255,0.16);
+      backdrop-filter:blur(10px) saturate(1.05);
+      border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,0.35), 0 8px 22px var(--shadow);
+      padding:18px;
+    }
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .stack{display:flex; flex-direction:column; gap:12px}
+    label{font-weight:600}
+    input[type="file"]{
+      color:var(--text);
+      background:var(--panel-2);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:10px; padding:10px;
+    }
+    select, input[type="range"]{
+      width:100%; padding:10px;
+      background:var(--panel-2); color:var(--text);
+      border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+    }
+    .range-wrap{display:flex; align-items:center; gap:10px}
+    .btn{
+      border:none; border-radius:10px; padding:12px 16px;
+      font-weight:700; cursor:pointer; min-height:44px;
+      color:#0F1224;
+      background:linear-gradient(135deg, #FFD700, #FF8C00, #FF6AC1);
+      box-shadow:0 8px 22px rgba(0,0,0,0.25), 0 6px 18px var(--shadow);
+      transition:transform .12s ease, filter .2s ease;
+    }
+    .btn:hover{filter:saturate(1.15) brightness(1.04)}
+    .btn:active{transform:translateY(1px)}
+    .note{font-size:.92rem; color:var(--muted)}
+    .error{color:var(--error); font-weight:600}
+    .status{
+      padding:10px; border-radius:10px; background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+    }
+    .status span{font-weight:700}
+    .preview-wrap{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    .preview{
+      background:var(--panel-2);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:12px; overflow:hidden;
+    }
+    .preview-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.12);
+      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    }
+    .preview-body{padding:12px}
+    .preview-body img{max-width:100%; border-radius:8px}
+    .download{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    .btn-secondary{
+      border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;
+      color:var(--text);
+      background:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+      border:1px solid rgba(255,255,255,0.16);
+      transition:transform .12s ease, filter .2s ease;
+    }
+    .btn-secondary:hover{filter:brightness(1.08)}
+    footer{margin-top:26px; text-align:center; color:var(--muted)}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} .preview-wrap{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="logo">Tools <span>Wonder</span></div>
+      <nav aria-label="Main navigation">
+        <a href="#top" style="color:var(--text); text-decoration:none; margin-left:12px">Home</a>
+        <a href="#compressor" style="color:var(--text); text-decoration:none; margin-left:12px">Tools</a>
+        <a href="#contact" style="color:var(--text); text-decoration:none; margin-left:12px">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <section id="top" class="title">
+    <h1>AI TOOL HUB</h1>
+    <p>Image Compressor — upload, choose quality, compress, preview, and download.</p>
+  </section>
+
+  <main id="compressor" class="container">
+    <div class="panel">
+      <div class="grid">
+        <div class="stack">
+          <label for="fileInput">Upload image</label>
+          <input id="fileInput" type="file" accept=".png,.jpg,.jpeg,.bmp,.gif,.tif,.tiff,.webp,image/*" />
+          <div class="note">
+            Supported inputs: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP. Large images may take longer to process.
+          </div>
+
+          <label for="formatSelect">Output format</label>
+          <select id="formatSelect">
+            <option value="jpeg">JPEG (smallest, lossy)</option>
+            <option value="webp">WEBP (small + good quality)</option>
+            <option value="png">PNG (lossless; may be larger)</option>
+          </select>
+
+          <label for="qualityPreset">Quality preset</label>
+          <select id="qualityPreset">
+            <option value="high">High (best quality)</option>
+            <option value="medium" selected>Medium (balanced)</option>
+            <option value="low">Low (smallest size)</option>
+          </select>
+
+          <div class="range-wrap">
+            <label for="qualityRange" style="margin:0">Custom quality</label>
+            <input id="qualityRange" type="range" min="1" max="100" value="75" />
+            <span id="qualityLabel" class="note">75%</span>
+          </div>
+
+          <button id="compressBtn" class="btn">Compress</button>
+          <div id="status" class="status" style="display:none;">
+            <span>Compressing image...</span> Please wait.
+          </div>
+          <div id="errorBox" class="error" style="display:none;"></div>
+          <div id="tips" class="note">
+            Tip: For images with transparency (PNG/GIF), choose WEBP to preserve alpha. JPEG will remove transparency.
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="preview-wrap">
+            <div class="preview" id="inputPreview" style="display:none;">
+              <div class="preview-head">
+                <strong>Input preview</strong>
+                <span id="inputMeta" class="note"></span>
+              </div>
+              <div class="preview-body">
+                <img id="inputImg" alt="Input preview" />
+              </div>
+            </div>
+
+            <div class="preview" id="outputPreview" style="display:none;">
+              <div class="preview-head">
+                <strong>Output preview</strong>
+                <span id="outputMeta" class="note"></span>
+              </div>
+              <div class="preview-body">
+                <img id="outputImg" alt="Output preview" />
+                <div class="download">
+                  <a id="downloadLink" class="btn-secondary" href="#" download>Download compressed file</a>
+                  <button id="resetBtn" class="btn-secondary">Reset</button>
+                </div>
+                <div id="formatNote" class="note" style="margin-top:6px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer id="contact">
+        Clean UI • Dark theme • Responsive • Client-side compression (PNG, JPEG, WEBP).
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const formatSelect = document.getElementById('formatSelect');
+    const qualityPreset = document.getElementById('qualityPreset');
+    const qualityRange = document.getElementById('qualityRange');
+    const qualityLabel = document.getElementById('qualityLabel');
+    const compressBtn = document.getElementById('compressBtn');
+    const statusBox = document.getElementById('status');
+    const errorBox = document.getElementById('errorBox');
+    const formatNote = document.getElementById('formatNote');
+
+    const inputPreview = document.getElementById('inputPreview');
+    const inputImg = document.getElementById('inputImg');
+    const inputMeta = document.getElementById('inputMeta');
+
+    const outputPreview = document.getElementById('outputPreview');
+    const outputImg = document.getElementById('outputImg');
+    const outputMeta = document.getElementById('outputMeta');
+    const downloadLink = document.getElementById('downloadLink');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let originalImage = null;
+    let originalName = null;
+    let originalType = null;
+    let originalSize = 0;
+
+    qualityPreset.addEventListener('change', () => {
+      const preset = qualityPreset.value;
+      const map = { high: 90, medium: 75, low: 50 };
+      qualityRange.value = map[preset];
+      qualityLabel.textContent = map[preset] + '%';
+    });
+
+    qualityRange.addEventListener('input', () => {
+      qualityLabel.textContent = qualityRange.value + '%';
+      if (qualityRange.value >= 85) qualityPreset.value = 'high';
+      else if (qualityRange.value >= 60) qualityPreset.value = 'medium';
+      else qualityPreset.value = 'low';
+    });
+
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImage(dataURL) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Unsupported or corrupted image'));
+        img.crossOrigin = 'anonymous';
+        img.src = dataURL;
+      });
+    }
+
+    function canvasEncode(img, targetFormat, qualityPct) {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+
+      // Preserve transparency for PNG/WEBP by drawing as-is
+      ctx.drawImage(img, 0, 0);
+
+      const quality = Math.max(0.1, Math.min(1.0, qualityPct / 100));
+      const mime = ({
+        png: 'image/png',
+        jpeg: 'image/jpeg',
+        webp: 'image/webp'
+      })[targetFormat];
+
+      // PNG ignores quality param (lossless). For JPEG/WEBP, quality is applied.
+      const dataURL = canvas.toDataURL(mime, mime === 'image/png' ? undefined : quality);
+      return { dataURL, mime, width: canvas.width, height: canvas.height };
+    }
+
+    fileInput.addEventListener('change', async (e) => {
+      errorBox.style.display = 'none';
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const validTypes = ['image/png','image/jpeg','image/jpg','image/webp','image/gif','image/bmp','image/tiff'];
+      if (!validTypes.includes(file.type)) {
+        errorBox.textContent = 'Unsupported file type. Please upload PNG, JPG/JPEG, BMP, GIF, TIFF, or WEBP.';
+        errorBox.style.display = 'block';
+        inputPreview.style.display = 'none';
+        outputPreview.style.display = 'none';
+        return;
+      }
+      if (file.size > 25 * 1024 * 1024) {
+        errorBox.textContent = 'File too large (over 25MB). Please choose a smaller image.';
+        errorBox.style.display = 'block';
+        inputPreview.style.display = 'none';
+        outputPreview.style.display = 'none';
+        return;
+      }
+
+      try {
+        const dataURL = await readFile(file);
+        const img = await loadImage(dataURL);
+        originalImage = img;
+        originalName = (file.name || 'image').replace(/\.[^.]+$/, '');
+        originalType = file.type;
+        originalSize = file.size;
+
+        inputImg.src = dataURL;
+        inputPreview.style.display = 'block';
+        inputMeta.textContent = `${file.type} • ${(file.size/1024).toFixed(1)} KB • ${img.naturalWidth}×${img.naturalHeight}px`;
+        outputPreview.style.display = 'none';
+
+        // Note transparency tip based on type
+        if (['image/png','image/gif','image/webp'].includes(file.type)) {
+          formatNote.textContent = 'Transparency detected. Use WEBP or PNG to preserve alpha. JPEG will remove transparency.';
+        } else {
+          formatNote.textContent = '';
+        }
+      } catch (err) {
+        errorBox.textContent = 'Failed to load image. Try a different file.';
+        errorBox.style.display = 'block';
+        inputPreview.style.display = 'none';
+      }
+    });
+
+    compressBtn.addEventListener('click', async () => {
+      errorBox.style.display = 'none';
+      if (!originalImage) {
+        errorBox.textContent = 'Please upload an image first.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      statusBox.style.display = 'block';
+      outputPreview.style.display = 'none';
+
+      try {
+        const fmt = formatSelect.value;             // 'jpeg' | 'webp' | 'png'
+        const qualityPct = parseInt(qualityRange.value, 10) || 75;
+        const result = canvasEncode(originalImage, fmt, qualityPct);
+
+        if (!result || !result.dataURL) throw new Error('Compression failed');
+
+        outputImg.src = result.dataURL;
+        outputMeta.textContent = `${result.mime} • ${result.width}×${result.height}px • quality ${qualityPct}%`;
+
+        // Estimate output size by base64 length
+        const base64Len = result.dataURL.length - result.dataURL.indexOf(',') - 1;
+        const approxBytes = Math.floor(base64Len * 0.75); // base64 -> bytes approx
+        const kb = (approxBytes / 1024).toFixed(1);
+        outputMeta.textContent += ` • ~${kb} KB`;
+
+        const ext = fmt === 'jpeg' ? 'jpg' : fmt;
+        downloadLink.href = result.dataURL;
+        downloadLink.download = `${originalName}-compressed.${ext}`;
+        outputPreview.style.display = 'block';
+
+        // Notes
+        if (fmt === 'png') {
+          formatNote.textContent = 'PNG is lossless. Size reduction depends on image content; for photos use JPEG/WEBP.';
+        } else if (fmt === 'webp') {
+          formatNote.textContent = 'WEBP offers good compression with quality. Use 60–80% for a strong size cut and good visual quality.';
+        } else {
+          formatNote.textContent = 'JPEG is lossy. Lower quality reduces size but may add visible artifacts.';
+        }
+      } catch (err) {
+        errorBox.textContent = 'Compression error. Try a different format or smaller image.';
+        errorBox.style.display = 'block';
+      } finally {
+        statusBox.style.display = 'none';
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      originalImage = null;
+      originalName = null;
+      originalType = null;
+      originalSize = 0;
+      inputPreview.style.display = 'none';
+      outputPreview.style.display = 'none';
+      errorBox.style.display = 'none';
+      statusBox.style.display = 'none';
+      formatNote.textContent = '';
+      qualityPreset.value = 'medium';
+      qualityRange.value = 75;
+      qualityLabel.textContent = '75%';
+      formatSelect.value = 'jpeg';
+    });
+  </script>
+</body>
+  </html>
